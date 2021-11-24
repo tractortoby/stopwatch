@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useReducer, useEffect, useRef } from "react";
 
-function App() {
+const initialState = {
+  isRunning: false,
+  time: 0,
+};
+
+export default function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const idRef = useRef(0);
+
+  useEffect(() => {
+    if (!state.isRunning) {
+      return;
+    }
+    idRef.current = setInterval(() => dispatch({ type: "tick" }), 1000);
+    return () => {
+      clearInterval(idRef.current);
+      idRef.current = 0;
+    };
+  }, [state.isRunning]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {state.time}s
+      <button onClick={() => dispatch({ type: "start" })}>Start</button>
+      <button onClick={() => dispatch({ type: "stop" })}>Stop</button>
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
     </div>
   );
 }
 
-export default App;
+function reducer(state, action) {
+  switch (action.type) {
+    case "start":
+      return { ...state, isRunning: true };
+    case "stop":
+      return { ...state, isRunning: false };
+    case "reset":
+      return { isRunning: false, time: 0 };
+    case "tick":
+      return { ...state, time: state.time + 1 };
+    default:
+      throw new Error();
+  }
+}
