@@ -37,7 +37,8 @@ function reducer(state, action) {
     case "stop":
       return { ...state, isRunning: false };
     case "reset":
-      return { isRunning: false, time: 0 };
+      // return { isRunning: false, time: 0 };
+      return initialState
     case "tick":
       return { ...state, time: state.time + 1 };
     default:
